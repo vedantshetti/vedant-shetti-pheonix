@@ -1,17 +1,8 @@
 defmodule TodoerPhoenix.Todos do
-  @moduledoc """
-  The Todos context — mirrors all todoController.js operations.
-  """
   import Ecto.Query
   alias TodoerPhoenix.Repo
   alias TodoerPhoenix.Todos.{Todo, Subtask}
 
-  # ── Pagination & Filters ────────────────────────────────────────────────────
-
-  @doc """
-  Returns paginated todos for a user with optional filters.
-  Mirrors getTodos() in todoController.js.
-  """
   def list_todos(user_id, opts \\ []) do
     page = max(1, opts[:page] || 1)
     limit = min(100, max(1, opts[:limit] || 10))
@@ -61,7 +52,6 @@ defmodule TodoerPhoenix.Todos do
     }
   end
 
-  @doc "Returns all distinct categories for a user."
   def list_categories(user_id) do
     Repo.all(
       from(t in Todo,
@@ -73,9 +63,6 @@ defmodule TodoerPhoenix.Todos do
     )
   end
 
-  # ── CRUD ─────────────────────────────────────────────────────────────────────
-
-  @doc "Creates a new todo for a user — auto-assigns next sequence."
   def create_todo(user_id, attrs) do
     max_seq =
       Repo.one(from(t in Todo, where: t.user_id == ^user_id, select: max(t.sequence))) || 0
@@ -85,7 +72,6 @@ defmodule TodoerPhoenix.Todos do
     |> Repo.insert()
   end
 
-  @doc "Updates a todo (must belong to user)."
   def update_todo(id, user_id, attrs) do
     case Repo.get_by(Todo, id: id, user_id: user_id) do
       nil -> {:error, :not_found}
@@ -93,7 +79,6 @@ defmodule TodoerPhoenix.Todos do
     end
   end
 
-  @doc "Deletes a todo (must belong to user)."
   def delete_todo(id, user_id) do
     case Repo.get_by(Todo, id: id, user_id: user_id) do
       nil -> {:error, :not_found}
@@ -101,12 +86,10 @@ defmodule TodoerPhoenix.Todos do
     end
   end
 
-  @doc "Bulk-deletes todos by IDs (must belong to user)."
   def bulk_delete_todos(ids, user_id) do
     Repo.delete_all(from(t in Todo, where: t.id in ^ids and t.user_id == ^user_id))
   end
 
-  @doc "Toggles the bookmarked flag on a todo."
   def toggle_bookmark(id, user_id) do
     case Repo.get_by(Todo, id: id, user_id: user_id) do
       nil -> {:error, :not_found}
@@ -114,7 +97,6 @@ defmodule TodoerPhoenix.Todos do
     end
   end
 
-  @doc "Reorders todos by setting sequence from ordered list of IDs."
   def reorder_todos(ordered_ids, user_id) do
     ordered_ids
     |> Enum.with_index(1)
@@ -127,8 +109,6 @@ defmodule TodoerPhoenix.Todos do
 
     :ok
   end
-
-  # ── Subtasks ─────────────────────────────────────────────────────────────────
 
   defp owns_todo?(todo_id, user_id) do
     Repo.exists?(from(t in Todo, where: t.id == ^todo_id and t.user_id == ^user_id))
@@ -178,7 +158,6 @@ defmodule TodoerPhoenix.Todos do
     end
   end
 
-  @doc "Returns a single todo with subtasks pre-loaded (must belong to user)."
   def get_todo(id, user_id) do
     case Repo.get_by(Todo, id: id, user_id: user_id) do
       nil -> nil

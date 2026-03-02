@@ -14,7 +14,6 @@ defmodule TodoerPhoenixWeb.Router do
     plug(:accepts, ["json"])
   end
 
-  # ── Public routes (Login / Register) ─────────────────────────────────────────
   scope "/", TodoerPhoenixWeb do
     pipe_through(:browser)
 
@@ -23,7 +22,6 @@ defmodule TodoerPhoenixWeb.Router do
     live("/", TodoLive, :index)
   end
 
-  # Enable LiveDashboard in development
   if Application.compile_env(:todoer_phoenix, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 
